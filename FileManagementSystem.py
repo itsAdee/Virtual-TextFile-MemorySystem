@@ -33,9 +33,14 @@ class FileManagementSystem:
                 return
 
     def append_file(self, name, data):
-        # print(name)
         file = self.files[name]
         file.append(data, self.Memory)
+
+    def write_file(self, name, data):
+        current_directory = self.current_directory
+        my_file = current_directory.find_file(name)
+        my_file.write(data, self.Memory)
+        return my_file
 
     def change_directory(self, name):
         if name == "..":
@@ -55,7 +60,7 @@ class FileManagementSystem:
 
         spaces = current_directory.level * 2
         for file in current_directory.files:
-            print(" " * spaces  + file.name + " " + str(file.id))
+            print(" " * spaces + file.name + " " + str(file.id))
         for directory in current_directory.subdirectories:
             if directory.name == self.current_directory.name:
                 print(" " * spaces + "*" + directory.name + "/")
