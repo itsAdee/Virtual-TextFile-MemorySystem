@@ -42,6 +42,16 @@ class FileManagementSystem:
         my_file.write(data, self.Memory)
         return my_file
 
+    def truncate_file(self, name, size):
+        current_directory = self.current_directory
+        my_file = current_directory.find_file(name)
+        my_file.truncatefile(self.Memory, size)
+
+    def MoveContent(self, name, start, end, newstart):
+        current_directory = self.current_directory
+        my_file = current_directory.find_file(name)
+        my_file.moveContentWithinFile(self.Memory, start, end, newstart)
+
     def change_directory(self, name):
         if name == "..":
             self.current_directory = self.current_directory.parent

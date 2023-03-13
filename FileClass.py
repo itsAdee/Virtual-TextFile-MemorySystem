@@ -55,6 +55,32 @@ class File:
                 size -= 64
         self.pointer += current_pointer
 
+    def moveContentWithinFile(self, MainMemory, start, end, new_start):
+        my_blocks = self.blocks.copy()
+        data = ""
+        for block in my_blocks:
+            data += MainMemory.blocks[block]
+        previous_data = data[:start]
+        selected_data = data[start:end+1]
+        next_data = data[end+1:]
+        new_data = previous_data[:new_start] + \
+            selected_data + previous_data[new_start:] + next_data
+        pointer = 0
+        for block in my_blocks:
+            MainMemory.blocks[block] = new_data[pointer:pointer + 64]
+            pointer += 64
+            if pointer > len(new_data):
+                break
+
+    def truncatefile(self, MainMemory, size):
+        self.file_size = size
+        my_blocks = self.blocks.copy()
+        data = ""
+        for block in my_blocks:
+            data += MainMemory.blocks[block]
+        new_data = data[:size]
+        self.write(new_data, MainMemory)
+
     def isDirectory(self):
         return False
 
