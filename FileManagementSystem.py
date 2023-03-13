@@ -40,6 +40,8 @@ class FileManagementSystem:
     def change_directory(self, name):
         if name == "..":
             self.current_directory = self.current_directory.parent
+        elif name == "root":
+            self.current_directory = self.root
         else:
             for directory in self.current_directory.subdirectories:
                 if directory.name == name:
@@ -54,8 +56,11 @@ class FileManagementSystem:
         spaces = current_directory.level * 2
         for file in current_directory.files:
             print(" " * spaces  + file.name + " " + str(file.id))
-        for directory in current_directory.subdirectories:                
-            print(" " * spaces + directory.name + "/")
+        for directory in current_directory.subdirectories:
+            if directory.name == self.current_directory.name:
+                print(" " * spaces + "*" + directory.name + "/")
+            else:
+                print(" " * spaces + directory.name + "/")
             self.MemoryMap(directory)
 
     def save(self):
@@ -65,3 +70,9 @@ class FileManagementSystem:
     def load(self):
         with open("file_system.pickle", "rb") as file:
             return pickle.load(file)
+
+    def listAll(self):
+        for i in self.current_directory.subdirectories:
+            print(i)
+        for i in self.current_directory.files:
+            print(i)
