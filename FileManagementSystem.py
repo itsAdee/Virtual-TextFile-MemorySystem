@@ -11,8 +11,7 @@ class FileManagementSystem:
         self.current_directory = self.root
         self.files = {}
         self.Memory = MainMemory()
-        self.directories = {}
-        self.directories["root"] = self.root
+        self.subdirectories = {}
 
     def create_file(self, name):
         file = File(name)
@@ -21,8 +20,9 @@ class FileManagementSystem:
 
     def create_directory(self, name):
         directory = Directory(name)
-        self.directories[name] = directory
+        self.subdirectories[name] = directory
         self.current_directory.add_subdirectory(directory)
+        self.change_directory(name)
 
     def delete_file(self, name):
         current_directory = self.current_directory
@@ -33,7 +33,7 @@ class FileManagementSystem:
                 return
 
     def append_file(self, name, data):
-        print(name)
+        # print(name)
         file = self.files[name]
         file.append(data, self.Memory)
 
@@ -41,15 +41,22 @@ class FileManagementSystem:
         if name == "..":
             self.current_directory = self.current_directory.parent
         else:
-            self.current_directory = self.directories[name]
+            for directory in self.current_directory.subdirectories:
+                if directory.name == name:
+                    self.current_directory = directory
+                    return
 
-    def MemoryMap(self):
-        for i in self.directories:
-            print("Directory: " + i)
-            for j in self.directories[i].files:
-                print("  File: " + str(j))
-                for k in j.blocks:
-                    print("     " + str(k))
+    def MemoryMap(self, current_directory=None):
+        if current_directory is None:
+            current_directory = self.root
+            print("/")
+
+        spaces = current_directory.level * 2
+        for file in current_directory.files:
+            print(" " * spaces  + file.name + " " + str(file.id))
+        for directory in current_directory.subdirectories:                
+            print(" " * spaces + directory.name + "/")
+            self.MemoryMap(directory)
 
     def save(self):
         with open("file_system.pickle", "wb") as file:

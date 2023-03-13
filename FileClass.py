@@ -25,14 +25,18 @@ class File:
 
     def append(self, data, MainMemory):
         size = len(data)
-        print(data)
         blockes_needed = size // 64
         for i in range(blockes_needed + 1):
             block = MainMemory.allocate_block(self)
             self.blocks.append(block)
-            print(block)
             MainMemory.blocks[block] = data[self.pointer:self.pointer + 64]
             self.pointer += 64
+
+    def isDirectory(self):
+        return False
+    
+    def isFile(self):
+        return True
 
     def __str__(self):
         return self.name + " " + str(self.id)
