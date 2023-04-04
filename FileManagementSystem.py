@@ -22,7 +22,7 @@ class FileManagementSystem:
         directory = Directory(name)
         self.subdirectories[name] = directory
         self.current_directory.add_subdirectory(directory)
-        self.change_directory(name)
+        # self.change_directory(name)
 
     def delete_file(self, name):
         current_directory = self.current_directory
@@ -47,12 +47,20 @@ class FileManagementSystem:
         my_file = current_directory.find_file(name)
         my_file.truncatefile(self.Memory, size)
 
+    def readFile(self, name):
+        current_directory = self.current_directory
+        my_file = current_directory.find_file(name)
+        return my_file.read(self.Memory)
+
     def MoveContent(self, name, start, end, newstart):
         current_directory = self.current_directory
         my_file = current_directory.find_file(name)
         my_file.moveContentWithinFile(self.Memory, start, end, newstart)
 
     def change_directory(self, name):
+        if self.current_directory.parent == None and name == "..":
+            return
+
         if name == "..":
             self.current_directory = self.current_directory.parent
         elif name == "root":
@@ -62,6 +70,17 @@ class FileManagementSystem:
                 if directory.name == name:
                     self.current_directory = directory
                     return
+
+    def passWorkingDirectory(self):
+        current_directory = self.current_directory
+        path = ""
+        while current_directory != None and current_directory.parent is not None:
+            path = "/" + current_directory.name + path
+            current_directory = current_directory.parent
+        if path == "":
+            path = "/"
+        return path
+        
 
     def MemoryMap(self, current_directory=None):
         if current_directory is None:
@@ -91,3 +110,56 @@ class FileManagementSystem:
             print(i)
         for i in self.current_directory.files:
             print(i)
+
+    '''
+    Adding the Terminal Interface
+    '''
+
+    def terminal(self):
+        while True:
+            prompt = input("\n> ").split(" ")
+            command = prompt[0]
+
+            if command == "exit":
+                break
+            elif command == "help":
+                print(
+                """Commands:
+                ls - list all files and directories
+                pwd - print working directory
+                cd - change directory
+                mkdir - make directory
+                touch - create file
+                rm - remove file
+                cat - read file
+                mmap - show memory map
+                help - show list of commands
+                exit - exit terminal
+                """)
+                pass
+            elif command == "ls":
+                self.listAll()
+                pass
+            elif command == "pwd":
+                print(self.passWorkingDirectory())
+            elif command == "cd":
+                self.change_directory(prompt[1])
+                pass
+            elif command == "mkdir":
+                self.create_directory(prompt[1])
+                pass
+            elif command == "touch":
+                self.create_file(prompt[1])
+                pass
+            elif command == "rm":
+                self.delete_file(prompt[1])
+                pass
+            elif command == "cat":
+                self.readFile(prompt[1])
+                pass
+            elif command == "mmap":
+                self.MemoryMap()
+                pass
+            else:
+                print("Invalid Command")
+                print("Type 'help' for a list of commands")

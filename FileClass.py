@@ -81,6 +81,12 @@ class File:
         new_data = data[:size]
         self.write(new_data, MainMemory)
 
+    def read(self, MainMemory):
+        data = ""
+        for block in self.blocks:
+            data += MainMemory.blocks[block]
+        return data
+
     def isDirectory(self):
         return False
 
