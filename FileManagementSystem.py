@@ -262,8 +262,11 @@ class FileManagementSystem:
 
             # Delete a directory (remove from the current directory): rmdir <dirname>
             elif command == "rmdir":
-                self.delete_directory(prompt[1])
-                pass
+                try:
+                    self.delete_directory(prompt[1])
+                    pass
+                except:
+                    print("Directory not found")
 
             # Create a file (add to the directory): touch <filename>
             elif command == "touch":
