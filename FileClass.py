@@ -80,8 +80,17 @@ class File:
         data = ""
         for block in my_blocks:
             data += MainMemory.blocks[block]
+        free_blocks = my_blocks
+        self.blocks.clear()
+        MainMemory.free_blocks(free_blocks)
         new_data = data[:size]
         self.write(new_data, MainMemory)
+
+    def delete(self, MainMemory):
+        self.file_size = 0
+        my_blocks = self.blocks.copy()
+        self.blocks.clear()
+        MainMemory.free_blocks(my_blocks)
 
     def read(self, MainMemory):
         data = ""

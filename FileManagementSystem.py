@@ -38,26 +38,35 @@ class FileManagementSystem:
         self.subdirectories[name] = directory
 
     def delete_file(self, name):
-        current_directory = self.current_directory
-        for file in current_directory.files:
-            if file.name == name:
-                current_directory.remove_file(file)
-                self.files.pop(name)
-                return
+        try:
+            current_directory = self.current_directory
+            for file in current_directory.files:
+                if file.name == name:
+                    file.delete(self.Memory)
+                    current_directory.remove_file(file)
+                    self.files.pop(name)
+                    return
+        except:
+            print("file not found")
 
     def delete_directory(self, directoryName):
-        directoryPath = directoryName.split("/")
+        try:
+            directoryPath = directoryName.split("/")
 
-        current_directory = self.current_directory
-        for i in directoryPath:
-            if i == "":
-                continue
-            for directory in current_directory.subdirectories:
-                if directory.name == i:
-                    current_directory = directory
-                    break
+            current_directory = self.current_directory
+            for i in directoryPath:
+                if i == "":
+                    continue
+                for directory in current_directory.subdirectories:
+                    if directory.name == i:
+                        current_directory = directory
+                        break
+            for file in current_directory.files:
+                file.delete(self.Memory)
+            current_directory.parent.subdirectories.remove(current_directory)
 
-        current_directory.parent.subdirectories.remove(current_directory)
+        except:
+            print("directory not found")
 
     def append_file(self, name, data):
         try:
@@ -70,6 +79,9 @@ class FileManagementSystem:
             print("The current directory has no such file")
         except:
             print("Something went wrong")
+
+    def print_used_blocks(self):
+        self.Memory.print_blocks()
 
     def write_file(self, name, data):
         try:
@@ -103,7 +115,7 @@ class FileManagementSystem:
         except ValueError:
             print("The file is empty")
         except:
-            print("Something went wrong")
+            print("Something went wrong, file not found")
 
     def MoveContent(self, name, start, end, newstart):
         try:
@@ -130,9 +142,13 @@ class FileManagementSystem:
                         break
 
     def moveFileInDirectory(self, fileName, newDirectory):
-        current_directory = self.current_directory
-        my_file = current_directory.find_file(fileName)
-        current_directory.remove_file(my_file)
+        try:
+            current_directory = self.current_directory
+            my_file = current_directory.find_file(fileName)
+            current_directory.remove_file(my_file)
+        except:
+            print("File not found")
+            return
 
         if newDirectory == "..":
             if current_directory.parent == None:
@@ -260,7 +276,10 @@ class FileManagementSystem:
                 self.create_directory(prompt[1])
                 pass
 
-            # Delete a directory (remove from the current directory): rmdir <dirname>
+            elif command == "blocks":
+                self.print_used_blocks()
+
+                # Delete a directory (remove from the current directory): rmdir <dirname>
             elif command == "rmdir":
                 try:
                     self.delete_directory(prompt[1])
