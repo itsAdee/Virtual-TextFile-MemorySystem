@@ -33,24 +33,36 @@ class FileManagementSystem:
                 return
 
     def append_file(self, name, data):
-        file = self.files[name]
-        file.append(data, self.Memory)
+        try:
+            file = self.files[name]
+            file.append(data, self.Memory)
+        except:
+            print("The current directory has no such file")
 
     def write_file(self, name, data):
-        current_directory = self.current_directory
-        my_file = current_directory.find_file(name)
-        my_file.write(data, self.Memory)
-        return my_file
+        try:
+            current_directory = self.current_directory
+            my_file = current_directory.find_file(name)
+            my_file.write(data, self.Memory)
+            return my_file
+        except:
+            print("The current directory has no such file")
 
     def truncate_file(self, name, size):
-        current_directory = self.current_directory
-        my_file = current_directory.find_file(name)
-        my_file.truncatefile(self.Memory, size)
+        try:
+            current_directory = self.current_directory
+            my_file = current_directory.find_file(name)
+            my_file.truncatefile(self.Memory, size)
+        except:
+            print("The current directory has no such file")
 
     def readFile(self, name):
-        current_directory = self.current_directory
-        my_file = current_directory.find_file(name)
-        return my_file.read(self.Memory)
+        try:
+            current_directory = self.current_directory
+            my_file = current_directory.find_file(name)
+            return my_file.read(self.Memory)
+        except:
+            print("The current directory has no such file")
 
     def MoveContent(self, name, start, end, newstart):
         current_directory = self.current_directory
@@ -80,7 +92,6 @@ class FileManagementSystem:
         if path == "":
             path = "/"
         return path
-        
 
     def MemoryMap(self, current_directory=None):
         if current_directory is None:
@@ -89,7 +100,11 @@ class FileManagementSystem:
 
         spaces = current_directory.level * 2
         for file in current_directory.files:
-            print(" " * spaces + file.name + " " + str(file.id))
+            blocks = ""
+            for block in file.blocks:
+                blocks += str(block) + ","
+            print(" " * spaces + file.name + " " + str(file.id) +
+                  " " + str(file.file_size) + " " + blocks)
         for directory in current_directory.subdirectories:
             if directory.name == self.current_directory.name:
                 print(" " * spaces + "*" + directory.name + "/")
@@ -124,7 +139,7 @@ class FileManagementSystem:
                 break
             elif command == "help":
                 print(
-                """Commands:
+                    """Commands:
                 ls - list all files and directories
                 pwd - print working directory
                 cd - change directory
@@ -134,6 +149,7 @@ class FileManagementSystem:
                 cat - read file
                 mmap - show memory map
                 help - show list of commands
+                save - save file system
                 exit - exit terminal
                 """)
                 pass
@@ -154,12 +170,30 @@ class FileManagementSystem:
             elif command == "rm":
                 self.delete_file(prompt[1])
                 pass
+            elif command == "wr":
+                written_text = ""
+                for i in range(2, len(prompt)):
+                    written_text += prompt[i] + " "
+                self.write_file(prompt[1], written_text)
+            elif command == "ap":
+                appended_text = ""
+                for i in range(2, len(prompt)):
+                    appended_text += prompt[i] + " "
+                self.append_file(prompt[1], appended_text)
+            elif command == "tr":
+                self.truncate_file(prompt[1], prompt[2])
+            elif command == "mv":
+                self.MoveContent(prompt[1], int(
+                    prompt[2]), int(prompt[3]), int(prompt[4]))
             elif command == "cat":
-                self.readFile(prompt[1])
+                print("the file is: ", prompt[1])
+                print(self.readFile(prompt[1]))
                 pass
             elif command == "mmap":
                 self.MemoryMap()
                 pass
+            elif command == "save":
+                self.save()
             else:
                 print("Invalid Command")
                 print("Type 'help' for a list of commands")

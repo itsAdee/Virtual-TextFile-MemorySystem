@@ -9,7 +9,7 @@ class File:
         self.pointer = 0
         self.file_size = 0
         self.blocks = list()
-        self.id = random.randint(0, 1000000)
+        self.id = random.randint(1, 1000000)
         while self.id in File.ids:
             self.id += 1
         File.ids.add(self.id)
@@ -55,14 +55,14 @@ class File:
                 size -= 64
         self.pointer += current_pointer
 
-    def moveContentWithinFile(self, MainMemory, start, end, new_start):
+    def moveContentWithinFile(self, MainMemory, start, size, new_start):
         my_blocks = self.blocks.copy()
         data = ""
         for block in my_blocks:
             data += MainMemory.blocks[block]
         previous_data = data[:start]
-        selected_data = data[start:end+1]
-        next_data = data[end+1:]
+        selected_data = data[start:start+size]
+        next_data = data[start+size:]
         new_data = previous_data[:new_start] + \
             selected_data + previous_data[new_start:] + next_data
         pointer = 0
