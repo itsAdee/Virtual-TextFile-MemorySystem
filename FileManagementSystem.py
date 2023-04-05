@@ -262,7 +262,6 @@ class FileManagementSystem:
                 appended_text = ""
                 for i in range(2, len(prompt)):
                     appended_text += prompt[i] + " "
-                print(appended_text)
                 self.append_file(prompt[1], appended_text)
             
             # Truncate a file (remove content): tr <filename> <end bit>
