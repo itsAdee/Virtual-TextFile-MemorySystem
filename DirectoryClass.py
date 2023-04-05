@@ -14,6 +14,9 @@ class Directory:
     def add_file(self, file):
         self.files.append(file)
 
+    def remove_file(self, file):
+        self.files.remove(file)
+
     def isDirectory(self):
         return True
 

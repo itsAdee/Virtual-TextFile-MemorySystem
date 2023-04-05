@@ -83,6 +83,30 @@ class FileManagementSystem:
                     self.current_directory = directory
                     return
 
+    def moveFileInDirectory(self, fileName, newDirectory):
+        current_directory = self.current_directory
+        my_file = current_directory.find_file(fileName)
+        current_directory.remove_file(my_file)
+        
+        if newDirectory == "..":
+            if current_directory.parent == None:
+                return
+            
+            current_directory = current_directory.parent
+            current_directory.add_file(my_file)
+            return
+
+        newFileDirectory = newDirectory.split("/")
+        for i in newFileDirectory:
+            if i == "":
+                continue
+            for directory in current_directory.subdirectories:
+                if directory.name == i:
+                    current_directory = directory
+                    break
+            
+        current_directory.add_file(my_file)
+
     def passWorkingDirectory(self):
         current_directory = self.current_directory
         path = ""
@@ -135,8 +159,11 @@ class FileManagementSystem:
             prompt = input("\n> ").split(" ")
             command = prompt[0]
 
+            # Exit the terminal
             if command == "exit":
                 break
+            
+            # Print the help menu
             elif command == "help":
                 print(
                     """Commands:
@@ -146,6 +173,11 @@ class FileManagementSystem:
                 mkdir - make directory
                 touch - create file
                 rm - remove file
+                wr - write to file
+                ap - append to file
+                tr - truncate file
+                mvc - move content within file
+                mvf - move file to another directory
                 cat - read file
                 mmap - show memory map
                 help - show list of commands
@@ -153,47 +185,79 @@ class FileManagementSystem:
                 exit - exit terminal
                 """)
                 pass
+            
+            # List all files and directories in the current directory
             elif command == "ls":
                 self.listAll()
                 pass
+            
+            # Pass the working directory
             elif command == "pwd":
                 print(self.passWorkingDirectory())
+            
+            # Change Directory
             elif command == "cd":
                 self.change_directory(prompt[1])
                 pass
+            
+            # Create a directory
             elif command == "mkdir":
                 self.create_directory(prompt[1])
                 pass
+            
+            # Create a file
             elif command == "touch":
                 self.create_file(prompt[1])
                 pass
+            
+            # Read a file
             elif command == "rm":
                 self.delete_file(prompt[1])
                 pass
+            
+            # Write to a file
             elif command == "wr":
                 written_text = ""
                 for i in range(2, len(prompt)):
                     written_text += prompt[i] + " "
                 self.write_file(prompt[1], written_text)
+            
+            # Append to a file
             elif command == "ap":
                 appended_text = ""
                 for i in range(2, len(prompt)):
                     appended_text += prompt[i] + " "
                 self.append_file(prompt[1], appended_text)
+            
+            # Truncate a file
             elif command == "tr":
                 self.truncate_file(prompt[1], prompt[2])
-            elif command == "mv":
+            
+            # Move content within a file
+            elif command == "mvc":
                 self.MoveContent(prompt[1], int(
                     prompt[2]), int(prompt[3]), int(prompt[4]))
+            
+            # Move a file to a different directory
+            elif command == "mvf":
+                self.moveFileInDirectory(prompt[1], prompt[2])
+
+            # Read a file
             elif command == "cat":
                 print("the file is: ", prompt[1])
                 print(self.readFile(prompt[1]))
                 pass
+            
+            # Show the memory map
             elif command == "mmap":
                 self.MemoryMap()
                 pass
+            
+            # Save the file system
             elif command == "save":
                 self.save()
+            
+            # Invalid command
             else:
                 print("Invalid Command")
                 print("Type 'help' for a list of commands")
