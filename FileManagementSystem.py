@@ -19,10 +19,23 @@ class FileManagementSystem:
         self.current_directory.add_file(file)
 
     def create_directory(self, name):
-        directory = Directory(name)
+        directoryPath = name.split("/")
+        current_directory = self.current_directory
+        for i in directoryPath:
+            if i == "":
+                continue
+            for directory in current_directory.subdirectories:
+                if directory.name == i:
+                    current_directory = directory
+                    break
+
+        if directoryPath[-1] == "":
+            directory = Directory(directoryPath[-2])
+        else:
+            directory = Directory(directoryPath[-1])
+
+        current_directory.add_subdirectory(directory)
         self.subdirectories[name] = directory
-        self.current_directory.add_subdirectory(directory)
-        # self.change_directory(name)
 
     def delete_file(self, name):
         current_directory = self.current_directory
@@ -31,6 +44,20 @@ class FileManagementSystem:
                 current_directory.remove_file(file)
                 self.files.pop(name)
                 return
+
+    def delete_directory(self, directoryName):
+        directoryPath = directoryName.split("/")
+
+        current_directory = self.current_directory
+        for i in directoryPath:
+            if i == "":
+                continue
+            for directory in current_directory.subdirectories:
+                if directory.name == i:
+                    current_directory = directory
+                    break
+        
+        current_directory.parent.subdirectories.remove(current_directory)
 
     def append_file(self, name, data):
         try:
@@ -75,13 +102,15 @@ class FileManagementSystem:
 
         if name == "..":
             self.current_directory = self.current_directory.parent
-        elif name == "root":
-            self.current_directory = self.root
         else:
-            for directory in self.current_directory.subdirectories:
-                if directory.name == name:
-                    self.current_directory = directory
-                    return
+            pathToDirectory = name.split("/")
+            for name in pathToDirectory:
+                if name == "":
+                    continue
+                for directory in self.current_directory.subdirectories:
+                    if directory.name == name:
+                        self.current_directory = directory
+                        break
 
     def moveFileInDirectory(self, fileName, newDirectory):
         current_directory = self.current_directory
@@ -159,11 +188,11 @@ class FileManagementSystem:
             prompt = input("\n> ").split(" ")
             command = prompt[0]
 
-            # Exit the terminal
+            # Exit the terminal: exit
             if command == "exit":
                 break
             
-            # Print the help menu
+            # Print the help menu: help
             elif command == "help":
                 print(
                     """Commands:
@@ -171,6 +200,7 @@ class FileManagementSystem:
                 pwd - print working directory
                 cd - change directory
                 mkdir - make directory
+                rmdir - remove directory
                 touch - create file
                 rm - remove file
                 wr - write to file
@@ -186,74 +216,80 @@ class FileManagementSystem:
                 """)
                 pass
             
-            # List all files and directories in the current directory
+            # List all files and directories in the current directory: ls
             elif command == "ls":
                 self.listAll()
                 pass
             
-            # Pass the working directory
+            # Pass the working directory: pwd
             elif command == "pwd":
                 print(self.passWorkingDirectory())
             
-            # Change Directory
+            # Change Directory: cd <dirname>
             elif command == "cd":
                 self.change_directory(prompt[1])
                 pass
             
-            # Create a directory
+            # Create a directory (add to the current directory): mkdir <dirname>
             elif command == "mkdir":
                 self.create_directory(prompt[1])
                 pass
             
-            # Create a file
+            # Delete a directory (remove from the current directory): rmdir <dirname>
+            elif command == "rmdir":
+                self.delete_directory(prompt[1])
+                pass
+
+            # Create a file (add to the directory): touch <filename>
             elif command == "touch":
                 self.create_file(prompt[1])
                 pass
             
-            # Read a file
+            # Delete a file (remove from the directory): rm <filename>
             elif command == "rm":
                 self.delete_file(prompt[1])
                 pass
             
-            # Write to a file
+            # Write to a file (overwrite): wr <filename> <text>
             elif command == "wr":
                 written_text = ""
                 for i in range(2, len(prompt)):
                     written_text += prompt[i] + " "
                 self.write_file(prompt[1], written_text)
             
-            # Append to a file
+            # Append to a file (add to the end): ap <filename> <text>
             elif command == "ap":
                 appended_text = ""
                 for i in range(2, len(prompt)):
                     appended_text += prompt[i] + " "
+                print(appended_text)
                 self.append_file(prompt[1], appended_text)
             
-            # Truncate a file
+            # Truncate a file (remove content): tr <filename> <end bit>
             elif command == "tr":
                 self.truncate_file(prompt[1], prompt[2])
             
-            # Move content within a file
+            # Move content within a file: mvc <filename> <start> <size> <newstart/target>
             elif command == "mvc":
                 self.MoveContent(prompt[1], int(
                     prompt[2]), int(prompt[3]), int(prompt[4]))
             
-            # Move a file to a different directory
+            # Move a file to a different directory: mvf <filename> <new directory>
             elif command == "mvf":
                 self.moveFileInDirectory(prompt[1], prompt[2])
 
-            # Read a file
+            # Read a file: cat <filename>
             elif command == "cat":
                 print("the file is: ", prompt[1])
                 print(self.readFile(prompt[1]))
                 pass
             
-            # Show the memory map
+            # Show the memory map: mmap
             elif command == "mmap":
                 self.MemoryMap()
                 pass
             
-            # Save the file system
+            # Save the file system: save
             elif command == "save":
                 self.save()
             
