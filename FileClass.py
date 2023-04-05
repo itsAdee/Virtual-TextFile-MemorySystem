@@ -17,6 +17,7 @@ class File:
     def write(self, data, MainMemory):
         size = len(data)
         freed_blocks = self.blocks.copy()
+        self.file_size = size
         self.blocks.clear()
         MainMemory.free_blocks(freed_blocks)
         self.file_size = size
@@ -39,9 +40,10 @@ class File:
         self.file_size += size
         last_block = self.blocks[-1]
         if MainMemory.space_left_in_a_block(last_block) >= 0:
+            space_left = MainMemory.space_left_in_a_block(last_block)
             MainMemory.blocks[last_block] += data[0:
-                                                  MainMemory.space_left_in_a_block(last_block)]
-            current_pointer += MainMemory.space_left_in_a_block(last_block)
+                                                  space_left]
+            current_pointer += space_left
         blockes_needed = (size - current_pointer) // 64
         for i in range(blockes_needed + 1):
             block = MainMemory.allocate_block(self)
