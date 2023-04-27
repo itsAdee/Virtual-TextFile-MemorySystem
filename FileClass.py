@@ -9,6 +9,8 @@ class File:
         self.pointer = 0
         self.file_size = 0
         self.blocks = list()
+        self.isBeingRead = False
+        self.isBeingWritten = False
         self.id = random.randint(1, 1000000)
         while self.id in File.ids:
             self.id += 1
@@ -86,6 +88,28 @@ class File:
         for block in self.blocks:
             data += MainMemory.blocks[block]
         return data
+    
+    def open(self, mode, log):
+        if mode == "r":
+            if self.isBeingWritten:
+                log.write(f"File {self.name} read failed: File is being written to")
+                return False
+            self.isBeingRead = True
+            return True
+        elif mode == "w":
+            if self.isBeingRead:
+                log.write(f"File {self.name} write failed: File is being read")
+                return False
+            self.isBeingWritten = True
+            return True
+        
+    def close(self, log):
+        if self.isBeingRead:
+            self.isBeingRead = False
+        elif self.isBeingWritten:
+            self.isBeingWritten = False
+        else:
+            log.write(f"File {self.name} close failed: File is not open")
 
     def isDirectory(self):
         return False

@@ -1,4 +1,5 @@
 from FileManagementSystem import *
+import threading
 
 file_system = FileManagementSystem()
 
@@ -17,13 +18,13 @@ def create_file_system():
 
     file_system.save()
 
+if __name__ == "__main__":
+    if os.path.exists("file_system.pickle"):
+        print("Loading file system...\n")
+        file_system = file_system.load()
 
-if os.path.exists("file_system.pickle"):
-    print("Loading file system...\n")
-    file_system = file_system.load()
+    else:
+        create_file_system()
 
-else:
-    create_file_system()
-
-file_system.MemoryMap()
-file_system.terminal()
+    file_system.MemoryMap()
+    file_system.terminal()

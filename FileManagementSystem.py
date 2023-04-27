@@ -146,24 +146,24 @@ class FileManagementSystem:
             path = "/"
         return path
 
-    def MemoryMap(self, current_directory=None):
+    def memoryMap(self, current_directory=None, log=None):
         if current_directory is None:
             current_directory = self.root
-            print("/")
+            log.write("/")
 
         spaces = current_directory.level * 2
         for file in current_directory.files:
             blocks = ""
             for block in file.blocks:
                 blocks += str(block) + ","
-            print(" " * spaces + file.name + " " + str(file.id) +
+            log.write(" " * spaces + file.name + " " + str(file.id) +
                   " " + str(file.file_size) + " " + blocks)
         for directory in current_directory.subdirectories:
             if directory.name == self.current_directory.name:
-                print(" " * spaces + "*" + directory.name + "/")
+                log.write(" " * spaces + "*" + directory.name + "/")
             else:
-                print(" " * spaces + directory.name + "/")
-            self.MemoryMap(directory)
+                log.write(" " * spaces + directory.name + "/")
+            self.memoryMap(directory, log)
 
     def save(self):
         with open("file_system.pickle", "wb") as file:
@@ -173,126 +173,104 @@ class FileManagementSystem:
         with open("file_system.pickle", "rb") as file:
             return pickle.load(file)
 
-    def listAll(self):
+    def listAll(self, log):
         for i in self.current_directory.subdirectories:
-            print(i)
+            log.write(i)
         for i in self.current_directory.files:
-            print(i)
+            log.write(i)
 
-    '''
-    Adding the Terminal Interface
-    '''
 
-    def terminal(self):
-        while True:
-            prompt = input("\n> ").split(" ")
-            command = prompt[0]
+    def execute(self, prompt, log):
+        prompt = prompt.split(" ")
+        command = prompt[0]
 
-            # Exit the terminal: exit
-            if command == "exit":
-                break
-            
-            # Print the help menu: help
-            elif command == "help":
-                print(
-                    """Commands:
-                ls - list all files and directories
-                pwd - print working directory
-                cd - change directory
-                mkdir - make directory
-                rmdir - remove directory
-                touch - create file
-                rm - remove file
-                wr - write to file
-                ap - append to file
-                tr - truncate file
-                mvc - move content within file
-                mvf - move file to another directory
-                cat - read file
-                mmap - show memory map
-                help - show list of commands
-                save - save file system
-                exit - exit terminal
-                """)
-                pass
-            
-            # List all files and directories in the current directory: ls
-            elif command == "ls":
-                self.listAll()
-                pass
-            
-            # Pass the working directory: pwd
-            elif command == "pwd":
-                print(self.passWorkingDirectory())
-            
-            # Change Directory: cd <dirname>
-            elif command == "cd":
-                self.change_directory(prompt[1])
-                pass
-            
-            # Create a directory (add to the current directory): mkdir <dirname>
-            elif command == "mkdir":
-                self.create_directory(prompt[1])
-                pass
-            
-            # Delete a directory (remove from the current directory): rmdir <dirname>
-            elif command == "rmdir":
-                self.delete_directory(prompt[1])
-                pass
+        if command == "ls":
+            log.write("Listing all files and directories: \n")
+            self.listAll(log)
+            pass
+        
+        elif command == "pwd":
+            log.write(self.passWorkingDirectory())
+        
+        # Change Directory: cd <dirname>
+        elif command == "cd":
+            self.change_directory(prompt[1])
+            log.write("Changed directory to: " + prompt[1])
+            pass
+        
+        # Create a directory (add to the current directory): mkdir <dirname>
+        elif command == "mkdir":
+            self.create_directory(prompt[1])
+            log.write("Created directory: " + prompt[1])
+            pass
+        
+        # Delete a directory (remove from the current directory): rmdir <dirname>
+        elif command == "rmdir":
+            self.delete_directory(prompt[1])
+            log.write("Deleted directory: " + prompt[1])
+            pass
 
-            # Create a file (add to the directory): touch <filename>
-            elif command == "touch":
-                self.create_file(prompt[1])
-                pass
-            
-            # Delete a file (remove from the directory): rm <filename>
-            elif command == "rm":
-                self.delete_file(prompt[1])
-                pass
-            
-            # Write to a file (overwrite): wr <filename> <text>
-            elif command == "wr":
-                written_text = ""
-                for i in range(2, len(prompt)):
-                    written_text += prompt[i] + " "
-                self.write_file(prompt[1], written_text)
-            
-            # Append to a file (add to the end): ap <filename> <text>
-            elif command == "ap":
-                appended_text = ""
-                for i in range(2, len(prompt)):
-                    appended_text += prompt[i] + " "
-                self.append_file(prompt[1], appended_text)
-            
-            # Truncate a file (remove content): tr <filename> <end bit>
-            elif command == "tr":
-                self.truncate_file(prompt[1], prompt[2])
-            
-            # Move content within a file: mvc <filename> <start> <size> <newstart/target>
-            elif command == "mvc":
-                self.MoveContent(prompt[1], int(
-                    prompt[2]), int(prompt[3]), int(prompt[4]))
-            
-            # Move a file to a different directory: mvf <filename> <new directory>
-            elif command == "mvf":
-                self.moveFileInDirectory(prompt[1], prompt[2])
+        # Create a file (add to the directory): touch <filename>
+        elif command == "touch":
+            self.create_file(prompt[1])
+            log.write("Created file: " + prompt[1])
+            pass
+        
+        # Delete a file (remove from the directory): rm <filename>
+        elif command == "rm":
+            self.delete_file(prompt[1])
+            log.write("Deleted file: " + prompt[1])
+            pass
+        
+        # Write to a file (overwrite): wr <filename> <text>
+        elif command == "wr":
+            written_text = ""
+            for i in range(2, len(prompt)):
+                written_text += prompt[i] + " "
+            self.write_file(prompt[1], written_text)
+            log.write("Wrote to file: " + prompt[1])
+        
+        # Append to a file (add to the end): ap <filename> <text>
+        elif command == "ap":
+            appended_text = ""
+            for i in range(2, len(prompt)):
+                appended_text += prompt[i] + " "
+            self.append_file(prompt[1], appended_text)
+            log.write("Appended to file: " + prompt[1])
+        
+        # Truncate a file (remove content): tr <filename> <end bit>
+        elif command == "tr":
+            self.truncate_file(prompt[1], prompt[2])
+            log.write("Truncated file: " + prompt[1])
+        
+        # Move content within a file: mvc <filename> <start> <size> <newstart/target>
+        elif command == "mvc":
+            self.MoveContent(prompt[1], int(
+                prompt[2]), int(prompt[3]), int(prompt[4]))
+            log.write("Moved content in file: " + prompt[1])
+        
+        # Move a file to a different directory: mvf <filename> <new directory>
+        elif command == "mvf":
+            self.moveFileInDirectory(prompt[1], prompt[2])
+            log.write("Moved file: " + prompt[1])
 
-            # Read a file: cat <filename>
-            elif command == "cat":
-                print("the file is: ", prompt[1])
-                print(self.readFile(prompt[1]))
-                pass
-            
-            # Show the memory map: mmap
-            elif command == "mmap":
-                self.MemoryMap()
-                pass
-            
-            # Save the file system: save
-            elif command == "save":
-                self.save()
-            
-            # Invalid command
-            else:
-                print("Invalid Command")
-                print("Type 'help' for a list of commands")
+        # Read a file: cat <filename>
+        elif command == "cat":
+            log.write("Read file: " + prompt[1])
+            log.write(self.readFile(prompt[1]))
+            pass
+        
+        elif command == "mmap":
+            log.write("Logging Memory Map: \n")
+            self.memoryMap(log)
+            log.write("Logged Memory Map\n")
+            pass
+
+        # Save the file system: save
+        elif command == "save":
+            self.save()
+            log.write("Saved file system")
+        
+        # Invalid command
+        else:
+            log.write("Invalid Command")
