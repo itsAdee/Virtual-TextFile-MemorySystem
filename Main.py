@@ -1,4 +1,5 @@
 from FileManagementSystem import *
+import User
 import threading
 
 file_system = FileManagementSystem()
@@ -25,6 +26,3 @@ if __name__ == "__main__":
 
     else:
         create_file_system()
-
-    file_system.MemoryMap()
-    file_system.terminal()

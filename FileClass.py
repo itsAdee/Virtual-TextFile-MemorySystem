@@ -1,5 +1,5 @@
 import random
-
+import time
 
 class File:
     ids = set()
@@ -16,7 +16,13 @@ class File:
             self.id += 1
         File.ids.add(self.id)
 
-    def write(self, data, MainMemory):
+    def write(self, data, MainMemory, log):
+        while self.isBeingRead:
+            log.write(f"Write Unsuccessful: File {self.name} is being read, waiting...")
+            time.sleep(0.5)
+            pass
+        self.isBeingWritten = True
+
         size = len(data)
         freed_blocks = self.blocks.copy()
         self.blocks.clear()
@@ -34,8 +40,15 @@ class File:
             else:
                 self.pointer += 64
                 size -= 64
+        self.isBeingWritten = False
 
-    def append(self, data, MainMemory):
+    def append(self, data, MainMemory, log):
+        while self.isBeingRead:
+            log.write(f"Append Unsuccessful: File {self.name} is being read, waiting...")
+            time.sleep(0.5)
+            pass
+        self.isBeingWritten = True
+        
         size = len(data)
         current_pointer = 0
         self.file_size += size
@@ -57,7 +70,13 @@ class File:
                 size -= 64
         self.pointer += current_pointer
 
-    def moveContentWithinFile(self, MainMemory, start, size, new_start):
+    def moveContentWithinFile(self, MainMemory, start, size, new_start, log):
+        while self.isBeingRead:
+            log.write("Operation Unsuccessful: File is being read, waiting...")
+            time.sleep(0.5)
+            pass
+        self.isBeingWritten = True
+
         my_blocks = self.blocks.copy()
         data = ""
         for block in my_blocks:
@@ -73,20 +92,36 @@ class File:
             pointer += 64
             if pointer > len(new_data):
                 break
+        
+        self.isBeingWritten = False
 
-    def truncatefile(self, MainMemory, size):
+    def truncatefile(self, MainMemory, size, log):
+        while self.isBeingRead:
+            log.write("Operation Unsuccessful: File is being read, waiting...")
+            time.sleep(0.5)
+            pass
+        self.isBeingWritten = True
+
         self.file_size = size
         my_blocks = self.blocks.copy()
         data = ""
         for block in my_blocks:
             data += MainMemory.blocks[block]
         new_data = data[:size]
-        self.write(new_data, MainMemory)
+        self.write(new_data, MainMemory, log)
+        self.isBeingWritten = False
 
-    def read(self, MainMemory):
+    def read(self, MainMemory, log):
+        while self.isBeingWritten:
+            log.write(f"Read Unsuccessful: File {self.name} is being written to, waiting...")
+            time.sleep(0.5)
+            pass
+        self.isBeingRead = True
+
         data = ""
         for block in self.blocks:
             data += MainMemory.blocks[block]
+        self.isBeingRead = False
         return data
     
     def open(self, mode, log):
