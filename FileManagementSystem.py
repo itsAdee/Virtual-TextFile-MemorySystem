@@ -68,97 +68,6 @@ class FileManagementSystem:
         my_file = current_directory.find_file(name)
         my_file.moveContentWithinFile(self.Memory, start, end, newstart, log)
 
-    """
-    ====================================================== OFFLIMITS ======================================================
-    """
-
-    def create_directory(self, name):
-        directoryPath = name.split("/")
-        current_directory = self.current_directory
-        for i in directoryPath:
-            if i == "":
-                continue
-            for directory in current_directory.subdirectories:
-                if directory.name == i:
-                    current_directory = directory
-                    break
-
-        if directoryPath[-1] == "":
-            directory = Directory(directoryPath[-2])
-        else:
-            directory = Directory(directoryPath[-1])
-
-        current_directory.add_subdirectory(directory)
-        self.subdirectories[name] = directory
-
-    def delete_directory(self, directoryName):
-        directoryPath = directoryName.split("/")
-
-        current_directory = self.current_directory
-        for i in directoryPath:
-            if i == "":
-                continue
-            for directory in current_directory.subdirectories:
-                if directory.name == i:
-                    current_directory = directory
-                    break
-        
-        current_directory.parent.subdirectories.remove(current_directory)
-
-    def change_directory(self, name):
-        if self.current_directory.parent == None and name == "..":
-            return
-
-        if name == "..":
-            self.current_directory = self.current_directory.parent
-        else:
-            pathToDirectory = name.split("/")
-            for name in pathToDirectory:
-                if name == "":
-                    continue
-                for directory in self.current_directory.subdirectories:
-                    if directory.name == name:
-                        self.current_directory = directory
-                        break
-
-    def moveFileInDirectory(self, fileName, newDirectory):
-        current_directory = self.current_directory
-        my_file = current_directory.find_file(fileName)
-        current_directory.remove_file(my_file)
-        
-        if newDirectory == "..":
-            if current_directory.parent == None:
-                return
-            
-            current_directory = current_directory.parent
-            current_directory.add_file(my_file)
-            return
-
-        newFileDirectory = newDirectory.split("/")
-        for i in newFileDirectory:
-            if i == "":
-                continue
-            for directory in current_directory.subdirectories:
-                if directory.name == i:
-                    current_directory = directory
-                    break
-            
-        current_directory.add_file(my_file)
-
-    def passWorkingDirectory(self):
-        current_directory = self.current_directory
-        path = ""
-        while current_directory != None and current_directory.parent is not None:
-            path = "/" + current_directory.name + path
-            current_directory = current_directory.parent
-        if path == "":
-            path = "/"
-        return path
-
-    """
-    ====================================================== OFFLIMITS ======================================================
-    """
-
     def memoryMap(self, current_directory=None, log=None):
         if current_directory is None:
             current_directory = self.root
@@ -188,9 +97,9 @@ class FileManagementSystem:
 
     def listAll(self, log):
         for i in self.current_directory.subdirectories:
-            log.write(i)
+            log.write(i.name + "/")
         for i in self.current_directory.files:
-            log.write(i)
+            log.write(i.name)
 
     def execute(self, prompt, log):
         prompt = prompt.split(" ")
@@ -244,13 +153,13 @@ class FileManagementSystem:
         # Read a file: cat <filename>
         elif command == "cat":
             log.write("Reading file: " + prompt[1])
-            log.write(self.readFile(prompt[1]), log)
-            log.write("File read\n")
+            log.write(self.readFile(prompt[1], log))
+            log.write("File read")
             pass
         
         elif command == "mmap":
-            log.write("Logging Memory Map: \n")
-            self.memoryMap(log)
+            log.write("\nLogging Memory Map:")
+            self.memoryMap(log=log)
             log.write("Logged Memory Map\n")
             pass
 
@@ -259,38 +168,3 @@ class FileManagementSystem:
             self.save()
             log.write("Saved file system")
         
-"""
-============================================================== OFFLIMITS ==============================================================
-"""
-
-"""
-        elif command == "pwd":
-            log.write(self.passWorkingDirectory())
-        
-        # Change Directory: cd <dirname>
-        elif command == "cd":
-            self.change_directory(prompt[1])
-            log.write("Changed directory to: " + prompt[1])
-            pass
-        
-        # Create a directory (add to the current directory): mkdir <dirname>
-        elif command == "mkdir":
-            self.create_directory(prompt[1])
-            log.write("Created directory: " + prompt[1])
-            pass
-        
-        # Delete a directory (remove from the current directory): rmdir <dirname>
-        elif command == "rmdir":
-            self.delete_directory(prompt[1])
-            log.write("Deleted directory: " + prompt[1])
-            pass
-        
-        # Move a file to a different directory: mvf <filename> <new directory>
-        elif command == "mvf":
-            self.moveFileInDirectory(prompt[1], prompt[2])
-            log.write("Moved file: " + prompt[1])
-"""
-
-"""
-============================================================== OFFLIMITS ==============================================================
-"""

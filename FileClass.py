@@ -70,6 +70,8 @@ class File:
                 size -= 64
         self.pointer += current_pointer
 
+        self.isBeingWritten = False
+
     def moveContentWithinFile(self, MainMemory, start, size, new_start, log):
         while self.isBeingRead:
             log.write("Operation Unsuccessful: File is being read, waiting...")

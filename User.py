@@ -2,14 +2,14 @@ from Log import Log
 
 class User:
     def __init__(self, name):
-        self.name = f"User_{name}"
-        self.log = Log(f"{name}_log.txt")
+        self.name = name
+        self.log = Log(f"user_commands/logs/{name}_log.txt")
     
     def runCommands(self, inputFile, fileManagementSystem):
         with open(inputFile, 'r') as f:
             commands = f.readlines()
             for command in commands:
-                self.log.write("Executing: " + command + "\n")
+                self.log.write("\nExecuting: " + command)
                 command = command.strip()
                 if command == "exit":
                     break

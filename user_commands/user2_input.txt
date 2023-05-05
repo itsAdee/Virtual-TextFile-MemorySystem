@@ -1,0 +1,9 @@
+mmap
+ls 
+touch user2File.txt
+wr user2File.txt "Hello World"
+ap user2File.txt "This update is being done by user2"
+cat user2File.txt
+ap user2File.txt "This is a second update by user2"
+cat user2File.txt
+mmap

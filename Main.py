@@ -1,5 +1,5 @@
 from FileManagementSystem import *
-import User
+from User import User
 import threading
 
 file_system = FileManagementSystem()
@@ -19,6 +19,11 @@ def create_file_system():
 
     file_system.save()
 
+def createUserThread(user_name):
+    user = User(user_name)
+    user.runCommands(f"user_commands/{user_name}_input.txt", file_system)    
+
+
 if __name__ == "__main__":
     if os.path.exists("file_system.pickle"):
         print("Loading file system...\n")
@@ -26,3 +31,16 @@ if __name__ == "__main__":
 
     else:
         create_file_system()
+
+    # Create multiple users on different threads
+    users = ["user1", "user2", "user3"]
+    threads = []
+    for user in users:
+        t = threading.Thread(target=createUserThread, args=(user,))
+        threads.append(t)
+        t.start()
+    
+    for t in threads:
+        t.join()
+    
+    # file_system.save()
