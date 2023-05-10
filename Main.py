@@ -34,6 +34,7 @@ if __name__ == "__main__":
         create_file_system()
 
     # Create multiple users on different threads
+    # for testing purposes please do not change the number of threads to greater than 3
     input = input("Enter the number of threads to create: ")
     input = int(input)
     users = []
@@ -50,15 +51,3 @@ if __name__ == "__main__":
     print("Saving file system...\n")
     print("File system saved.\n")
     file_system.save()
-
-    # users = ["user1", "user2", "user3"]
-    # threads = []
-    # for user in users:
-    #     t = threading.Thread(target=createUserThread, args=(user,))
-    #     threads.append(t)
-    #     t.start()
-
-    # for t in threads:
-    #     t.join()
-
-    # file_system.save()
