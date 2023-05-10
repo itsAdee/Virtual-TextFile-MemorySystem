@@ -1,0 +1,146 @@
+
+Executing: mmap
+
+
+Logging Memory Map:
+/
+  fileInRoot.txt 88119 0 
+  newFile.txt 514673 11 10,
+  dir1/
+    fileInDir1.txt 916258 0 
+    dir2/
+  dir3/
+    mynewteztfile.txt 187205 141 1,8,9,
+Logged Memory Map
+
+
+Executing: ls 
+
+Listing all files and directories: 
+
+dir1/
+dir3/
+fileInRoot.txt
+newFile.txt
+
+
+
+Executing: touch user3File.txt
+
+Created file: user3File.txt
+
+Executing: wr user3File.txt "Hello World"
+
+Wrote to file: user3File.txt
+
+Executing: ap user3File.txt "This update is being done by user3"
+
+Appended to file: user3File.txt
+
+Executing: cat user3File.txt
+
+Reading file: user3File.txt
+"Hello World" "This update is being done by user3" is being done by user3" 
+File read
+
+Executing: ap user3File.txt "This is the second update by user3"
+
+Appended to file: user3File.txt
+
+Executing: cat user3File.txt
+
+Reading file: user3File.txt
+"Hello World" "This update is being done by user3" is being done by user3" "This is the second update by user3" is is the second update by user3" 
+File read
+
+Executing: mmap
+
+Logging Memory Map:
+/
+  fileInRoot.txt 88119 0 
+  newFile.txt 514673 11 10,
+  user1File.txt 257885 88 11,14,17,
+  user2File.txt 306332 86 13,15,19,
+  user3File.txt 828205 88 12,16,18,
+  dir1/
+    fileInDir1.txt 916258 0 
+    dir2/
+  dir3/
+    mynewteztfile.txt 187205 141 1,8,9,
+Logged Memory Map
+
+
+Executing: mmap
+
+
+Logging Memory Map:
+/
+  fileInRoot.txt 88119 0 
+  newFile.txt 514673 11 10,
+  user2File.txt 159273 86 11,13,15,
+  user1File.txt 758514 88 12,14,16,
+  dir1/
+    fileInDir1.txt 916258 0 
+    dir2/
+  dir3/
+    mynewteztfile.txt 187205 141 1,8,9,
+Logged Memory Map
+
+
+Executing: ls 
+
+Listing all files and directories: 
+
+dir1/
+dir3/
+fileInRoot.txt
+newFile.txt
+user2File.txt
+user1File.txt
+
+
+
+Executing: touch user3File.txt
+
+Created file: user3File.txt
+
+Executing: wr user3File.txt "Hello World"
+
+Wrote to file: user3File.txt
+
+Executing: ap user3File.txt "This update is being done by user3"
+
+Appended to file: user3File.txt
+
+Executing: cat user3File.txt
+
+Reading file: user3File.txt
+"Hello World" "This update is being done by user3" is being done by user3" 
+File read
+
+Executing: ap user3File.txt "This is the second update by user3"
+
+Appended to file: user3File.txt
+
+Executing: cat user3File.txt
+
+Reading file: user3File.txt
+"Hello World" "This update is being done by user3" is being done by user3" "This is the second update by user3" is is the second update by user3" 
+File read
+
+Executing: mmap
+
+Logging Memory Map:
+/
+  fileInRoot.txt 88119 0 
+  newFile.txt 514673 11 10,
+  user2File.txt 159273 86 11,15,19,
+  user1File.txt 758514 88 12,13,18,
+  user3File.txt 196812 88 17,14,16,
+  dir1/
+    fileInDir1.txt 916258 0 
+    dir2/
+  dir3/
+    mynewteztfile.txt 187205 141 1,8,9,
+Logged Memory Map
+

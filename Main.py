@@ -38,7 +38,7 @@ if __name__ == "__main__":
     input = int(input)
     users = []
     for i in range(input):
-        users.append(f"user{i}")
+        users.append(f"user{i+1}")
     threads = []
     for user in users:
         t = threading.Thread(target=createUserThread, args=(user,))
